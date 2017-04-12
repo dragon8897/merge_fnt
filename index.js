@@ -1,14 +1,47 @@
 'use strict';
+const fs = require('fs-extra');
+const path = require('path');
 const co = require('co');
+const program = require('commander');
 
 const merge = require('./merge');
+const folder = require('./folder');
 
-merge.mergePng('FZZY_Size48_darkblue.png', 'ttt.png').then(function(val){
-    console.log(val)
-}, function(err) {
-    console.error(err);
-})
+program
+    .version('0.0.1')
+    .usage('[options]')
+    .option('-i, --input <value>', 'The input directory.')
+    .option('-o, --output <value>', 'The output directory.')
+    .parse(process.argv);
 
-merge.mergeFnt('FZZY_Size48_darkblue.fnt', 256, 'ccc.fnt').then(function(val){
-    
-})
+
+
+
+if (program.input && program.output )
+{
+	if(!fs.existsSync(program.output))
+	{
+		fs.mkdirsSync(program.output);
+	}
+	if(fs.existsSync(program.input))
+	{
+		folder.scan(program.input, function(file){
+			var fn = path.basename(file, '.fnt');
+			if (!fn.endsWith('_en'))
+			{
+				co(function* (){
+					var height = yield merge.mergePng(path.join(program.input, `${fn}.png`), path.join(program.output, `${fn}.png`));
+					yield merge.mergeFnt(path.join(program.input, `${fn}.fnt`), height, path.join(program.output, `${fn}.fnt`));
+				})
+			}
+		}, 'fnt')
+	}
+	else
+	{
+		console.error(`${program.input} does not exist!`);
+	}
+}
+else
+{
+	program.outputHelp();
+}
