@@ -30,9 +30,15 @@ if (program.input && program.output )
 			if (!fn.endsWith('_en'))
 			{
 				co(function* (){
+                    console.log(`${fn} begin`);
 					var height = yield merge.mergePng(path.join(program.input, `${fn}.png`), path.join(program.output, `${fn}.png`));
 					yield merge.mergeFnt(path.join(program.input, `${fn}.fnt`), height, path.join(program.output, `${fn}.fnt`));
-				})
+					console.log(`${fn} done`);
+				}).then(function (value) {
+                    
+                }, function (err) {
+                  console.error(err.stack);
+                });
 			}
 		}, 'fnt')
 	}

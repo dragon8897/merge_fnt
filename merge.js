@@ -19,7 +19,7 @@ function mergePng(pngName, outputName)
         var merge = input
             .clone()
             .background({r: 0, g: 0, b: 0, alpha: 0})
-            .extend({top: 0, bottom: m2.height, left: 0, right: 0});
+            .extend({top: 0, bottom: m2.height, left: 0, right: m1.width < m2.width ? m2.width - m1.width : 0});
         merge
             .overlayWith(pngNameEn, {
                 top: m1.height,
